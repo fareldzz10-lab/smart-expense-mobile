@@ -12,12 +12,12 @@ import { UserProfile } from "../types";
 
 // Konfigurasi Hardcoded (Sesuai Screenshot Anda)
 const firebaseConfig = {
-  apiKey: "AIzaSyBFSteGdB0TFUyfSzjiGxxGVm5YgCBDqIk",
-  authDomain: "smart-expense-mobile.firebaseapp.com",
-  projectId: "smart-expense-mobile",
-  storageBucket: "smart-expense-mobile.firebasestorage.app",
-  messagingSenderId: "418250456324",
-  appId: "1:418250456324:web:18e13a51aff1942a372451",
+  apiKey: "AIzaSyBFSteGdB0TFUyfSzjiGxxGVm5YgCBDqIk"
+  authDomain: "smart-expense-mobile.firebaseapp.com"
+  projectId: "smart-expense-mobile"
+  storageBucket: "smart-expense-mobile.firebasestorage.app"
+  messagingSenderId: "418250456324"
+  appId: "1:418250456324:web:18e13a51aff1942a372451"
 };
 
 // Initialize Firebase with Singleton Pattern
