@@ -1,45 +1,36 @@
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp } from "firebase/app";
 import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
   signOut,
   onAuthStateChanged,
+  User,
 } from "firebase/auth";
-import type { User, Auth } from "firebase/auth";
-import type { FirebaseApp } from "firebase/app";
 import { UserProfile } from "../types";
 
-// Konfigurasi Hardcoded (Sesuai Screenshot Anda)
+// --- CONFIG HARDCODED (Supaya Vercel tidak error) ---
 const firebaseConfig = {
-  apiKey: "AIzaSyBFSteGdB0TFUyfSzjiGxxGVm5YgCBDqIk"
-  authDomain: "smart-expense-mobile.firebaseapp.com"
-  projectId: "smart-expense-mobile"
-  storageBucket: "smart-expense-mobile.firebasestorage.app"
-  messagingSenderId: "418250456324"
-  appId: "1:418250456324:web:18e13a51aff1942a372451"
+  apiKey: "AIzaSyBFSteGdB0TFUyfSzjiGxxGVm5YgCBDqIk",
+  authDomain: "smart-expense-mobile.firebaseapp.com",
+  projectId: "smart-expense-mobile",
+  storageBucket: "smart-expense-mobile.firebasestorage.app",
+  messagingSenderId: "418250456324",
+  appId: "1:418250456324:web:18e13a51aff1942a372451",
 };
 
-// Initialize Firebase with Singleton Pattern
-let app: FirebaseApp;
+// Initialize Firebase
+let app;
+let auth: any;
 
-// Check if firebase app is already initialized to prevent errors
-if (getApps().length > 0) {
-  app = getApp();
-  console.log("Firebase using existing instance.");
-} else {
-  try {
-    app = initializeApp(firebaseConfig);
-    console.log("Firebase initialized fresh.");
-  } catch (e) {
-    console.error("Firebase Initialization Error:", e);
-    // Re-throw to ensure we don't try to use an uninitialized app
-    throw e;
-  }
+try {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  console.log("Firebase initialized successfully (Hardcoded Config).");
+} catch (e) {
+  console.error("Firebase Initialization Error:", e);
 }
 
-// Initialize Auth
-const auth: Auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 export { auth };
@@ -53,8 +44,6 @@ export const loginWithGoogle = async (): Promise<UserProfile | null> => {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
 
-    if (!user) return null;
-
     return {
       name: user.displayName || "User",
       email: user.email || "",
@@ -64,14 +53,9 @@ export const loginWithGoogle = async (): Promise<UserProfile | null> => {
         `https://ui-avatars.com/api/?name=${user.displayName}&background=random`,
     };
   } catch (error: any) {
-    console.error("Firebase Login Error Full:", error);
-    if (error.code === "auth/configuration-not-found") {
-      alert(
-        "Error Config: Pastikan domain localhost sudah ada di Authorized Domains di Firebase Console."
-      );
-    } else if (error.code === "auth/popup-closed-by-user") {
-      // User closed the popup, no need to alert
-      console.log("Login cancelled by user");
+    console.error("Firebase Login Error:", error);
+    if (error.code === "auth/popup-closed-by-user") {
+      console.log("Login dibatalkan user.");
     } else {
       alert("Gagal Login: " + error.message);
     }
