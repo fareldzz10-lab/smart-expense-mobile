@@ -9,7 +9,7 @@ import {
 } from "firebase/auth";
 import { UserProfile } from "../types";
 
-// --- CONFIG HARDCODED (Supaya Vercel tidak error) ---
+// --- CONFIG HARDCODED ---
 const firebaseConfig = {
   apiKey: "AIzaSyBFSteGdB0TFUyfSzjiGxxGVm5YgCBDqIk",
   authDomain: "smart-expense-mobile.firebaseapp.com",
@@ -26,7 +26,7 @@ let auth: any;
 try {
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
-  console.log("Firebase initialized successfully (Hardcoded Config).");
+  console.log("Firebase initialized successfully.");
 } catch (e) {
   console.error("Firebase Initialization Error:", e);
 }
@@ -54,23 +54,34 @@ export const loginWithGoogle = async (): Promise<UserProfile | null> => {
     };
   } catch (error: any) {
     console.error("Firebase Login Error:", error);
-    if (error.code === "auth/popup-closed-by-user") {
-      console.log("Login dibatalkan user.");
-    } else {
+    if (error.code !== "auth/popup-closed-by-user") {
       alert("Gagal Login: " + error.message);
     }
     return null;
   }
 };
 
+// --- BAGIAN YANG DIPERBAIKI (LOGOUT) ---
 export const logoutUser = async () => {
   if (!auth) return false;
   try {
-    await signOut(auth);
+    // 1. Tunggu proses Sign Out Firebase sampai BENAR-BENAR selesai
+    await auth.signOut();
+
+    // 2. Bersihkan data lokal setelah step 1 sukses
     localStorage.removeItem("smart_expense_user");
+    localStorage.clear();
+
+    // 3. Beri jeda sedikit (500ms) untuk memastikan browser menghapus session
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+
     return true;
   } catch (error) {
     console.error("Logout Error:", error);
+    // Tetap paksa reload jika error, agar tidak stuck
+    window.location.reload();
     return false;
   }
 };
